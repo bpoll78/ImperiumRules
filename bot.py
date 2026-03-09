@@ -6,11 +6,8 @@ from discord.ext import commands
 # -------------------------------------------------
 # Configuration
 # -------------------------------------------------
-
-# Either set the DISCORD_TOKEN environment variable,
-# or replace the line below with your token string, e.g.
-# TOKEN = "YOUR_BOT_TOKEN_HERE"
-
+# Set the DISCORD_TOKEN environment variable to your bot token.
+TOKEN = os.getenv("DISCORD_TOKEN")
 # Name of the channel where rules should be posted
 RULES_CHANNEL_NAME = "rules"
 
@@ -109,7 +106,7 @@ def main():
             "or hard-code your token into the TOKEN variable in bot.py."
         )
 
-    bot.run(TOKEN)
+    bot.run(DISCORD_TOKEN)
 
 
 if __name__ == "__main__":
