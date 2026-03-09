@@ -100,7 +100,7 @@ async def send_rules_error(ctx: commands.Context, error: commands.CommandError):
 
 
 def main():
-    if not TOKEN:
+    if not DISCORD_TOKEN:
         raise RuntimeError(
             "No bot token found. Set the DISCORD_TOKEN environment variable "
             "or hard-code your token into the TOKEN variable in bot.py."
