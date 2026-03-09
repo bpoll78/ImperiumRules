@@ -1,7 +1,28 @@
 import os
+import threading
 
 import discord
 from discord.ext import commands
+
+# Optional: minimal HTTP server so Render keeps the process alive (Web Service).
+# If PORT is set (e.g. on Render), we listen on it and return 200 for health checks.
+def run_health_server():
+    try:
+        port = int(os.environ.get("PORT", 0))
+    except ValueError:
+        port = 0
+    if port <= 0:
+        return
+    from http.server import HTTPServer, BaseHTTPRequestHandler
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+            self.wfile.write(b"OK")
+        def log_message(self, format, *args): ...
+    server = HTTPServer(("0.0.0.0", port), Handler)
+    server.serve_forever()
 
 # -------------------------------------------------
 # Configuration
@@ -100,13 +121,18 @@ async def send_rules_error(ctx: commands.Context, error: commands.CommandError):
 
 
 def main():
-    if not DISCORD_TOKEN:
+    if not TOKEN:
         raise RuntimeError(
             "No bot token found. Set the DISCORD_TOKEN environment variable "
             "or hard-code your token into the TOKEN variable in bot.py."
         )
 
-    bot.run(DISCORD_TOKEN)
+    # On Render (Web Service), PORT is set. Keep the process alive with a health server.
+    if os.environ.get("PORT"):
+        t = threading.Thread(target=run_health_server, daemon=True)
+        t.start()
+
+    bot.run(TOKEN)
 
 
 if __name__ == "__main__":
